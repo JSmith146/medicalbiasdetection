@@ -1,0 +1,546 @@
+
+LOG: 
+    dir: MBD_Runs/{RUN}/data/log
+    path: MBD_Runs/{RUN}/data/log/csn_log.csv
+
+DIR:
+    data: MBD_Runs/{RUN}/data/{TYPE}
+    train_test_split: MBD_Runs/{RUN}/train_test_split/
+    models: MBD_Runs/{RUN}/models/XGB/{OBJECTIVE}
+    predictions: MBD_Runs/{RUN}/predictions/{OBJECTIVE}/{TYPE}
+    images: MBD_Runs/{RUN}/images/{OBJECTIVE}
+    variations: MBD_Runs/{RUN}/variations/{VAR_NAME}/{OBJECTIVE}
+    thresholds: MBD_Runs/{RUN}/thresholds/{OBJECTIVE}
+    cases: MBD_Runs/{RUN}/data/cases/positive_cases.csv
+
+# data files
+data:
+    sep3_summary: /labs/kamaleswaranlab/MODS/Smith/my_scripts/public/data/sepsis3.csv
+    sep3_dtypes: /labs/kamaleswaranlab/MODS/Smith/my_scripts/public/data/sepsis3.json
+    lab_treatment_dict: /labs/kamaleswaranlab/MODS/Smith/my_scripts/public/data/lab_trt_dict.json
+    zipcode: /labs/kamaleswaranlab/MODS/Smith/my_scripts/Thesis/Chapter_2-ImplicitBiasDetection/data/US.txt
+    supertable: /labs/kamaleswaranlab/MODS/Smith/Data/super_table_data_dictionary.csv
+    pat_pkl: /labs/kamaleswaranlab/MODS/Encounter_Pickles/gr/{year}/{csn}.pickle
+    pkl_dtypes: /labs/kamaleswaranlab/MODS/Smith/Data/pkl_map.json
+
+    grady: 
+        enc_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/gr/gr_sepsis_summary/07_02_21/encounter_summary_all_07_02_2021.csv
+        elix_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/gr/gr_sepsis_summary/07_02_21/quan_elix_icd10_all07_02_2021.csv
+        extra_summary: /labs/kamaleswaranlab/MODS/Smith/Data/language/grady/grady_extra_vars.csv
+        demographic: /labs/kamaleswaranlab/MODS/Data/Grady_Data/1. Administrative Attributes/Encounters/
+        incarceration: /labs/kamaleswaranlab/MODS/Smith/Data/Grady extra vars - Language, Legal Citizenship, Zip, Incarceration.xlsx
+        static: /labs/kamaleswaranlab/MODS/Smith/Data/grady_static.csv
+        keep_cols:
+            - csn
+            - first_sep3_time
+            - first_sep3_susp
+            - first_sep3_SOFA
+            - start_index 
+            - first_icu_start
+            - first_icu_end
+            - total_vent_days
+            - hospital_discharge_date_time
+            - discharge_status
+            - age
+            - gender
+            - gender_code
+            - race
+            - ethnicity_code
+            - LANGUAGE
+            - IMMIGRATION_STATUS
+            - PATIENT_TYPE_1
+            - PATIENT_TYPE_2
+        lat: 33.7518
+        long: -84.3824
+        
+    emory:
+        enc_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/em2/em_sepsis_summary/encounter_summary
+        elix_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/em/em_sepsis_summary/7_2_21/quan_elix_icd10_all07_02_2021.csv
+        extra_summary: /labs/kamaleswaranlab/MODS/Smith/Data/language/emory/emory_extra_vars.csv
+        language: /labs/kamaleswaranlab/MODS/Smith/Data/Emory extra var - Language.csv
+        demographic: 
+        keep_cols:
+            - csn
+            - first_sep3_time
+            - first_sep3_susp
+            - first_sep3_SOFA
+            - start_index 
+            - first_icu_start
+            - first_icu_end
+            - hospital_discharge_date_time
+            - discharge_status
+            - age
+            - gender
+            - gender_code
+            - race
+            - ethnicity_code
+        lat: 33.7914
+        long: -84.3195
+    
+ 
+preprocess:
+    fim_cols:
+        - alanine_aminotransferase_(alt)
+        - albumin
+        - alkaline_phosphatase
+        - anion_gap
+        - aspartate_aminotransferase_(ast)
+        - base_excess
+        - bicarb_(hco3)
+        - bilirubin_total
+        - blood_urea_nitrogen_(bun) 
+        - calcium
+        - chloride
+        - creatinine
+        - daily_weight_kg 
+        - fio2
+        - gcs_total_score
+        - glucose
+        - hematocrit
+        - hemoglobin
+        - magnesium
+        - partial_pressure_of_carbon_dioxide_(paco2)
+        - partial_pressure_of_oxygen_(pao2)
+        - pf_pa
+        - pf_sp
+        - ph
+        - phosphorus
+        - platelets
+        - potassium
+        - protein
+        - sodium
+        - vent_status
+        - white_blood_cell_count
+        - sofa_score_total
+        - sirs_score_total
+        - sbp_line
+        - dbp_line
+        - map_line
+        - best_map
+        
+    vital_cols:
+        - pulse
+        - spo2
+        - unassisted_resp_rate
+        - temperature
+        - sbp_line
+        - dbp_line
+        - map_line
+        - best_map
+        
+    drop_missing:
+        - ammonia
+        - amylase
+        - b-type_natriuretic_peptide_(bnp)
+        - crp_high_sens
+        - d_dimer
+        - dobutamine_dose_weight
+        - dopamine_dose_weight
+        - epinephrine_dose_weight
+        - erythrocyte_sedimentation_rate_(esr) 
+        - fibrinogen
+        - hemoglobin_a1c
+        - inr
+        - lactic_acid
+        - lipase
+        - norepinephrine_dose_weight 
+        - parathyroid_level
+        - partial_prothrombin_time_(ptt)
+        - phenylephrine_dose_weight
+        - prealbumin
+        - procalcitonin
+        - prothrombin_time_(pt)
+        - saturation_of_oxygen_(sao2)
+        - thrombin_time
+        - thyroid_stimulating_hormone_(tsh) 
+        - transferrin
+        - troponin
+        - vasopressin_dose_weight
+        
+    drop_cols:
+        - index
+        - sofa_2_time
+        - timestamp
+        - year
+
+model:
+    drop_cols:
+        - csn
+        - sepsis
+        - sepsis_lag_2
+        - sepsis_lag_4
+        - sepsis_lag_5
+        - sepsis_lag_6
+    
+meta:
+    time_cols:
+        - first_sep3_time
+        - first_sep3_susp
+        - first_sep3_SOFA
+        - start_index
+        - first_icu_start
+        - first_icu_end
+        - hospital_discharge_date_time
+        - sofa_2_time
+        - vent_start_time
+        - worst_pf_pa_time
+        - worst_pf_sp_time
+        - first_sep2_susp
+        - first_sep2_SIRS
+        - first_sep2_time
+        - first_sep3_susp
+        - first_sep3_SOFA
+        - first_sep3_time
+        - first_sep3_susp_mod
+        - first_sep3_SOFA_mod
+        - first_sep3_time_mod
+        - ed_presentation_time
+        - hospital_admission_date_time
+        - hospital_discharge_date_time
+        - start_index
+        - first_icu_start
+        - first_icu_end
+        - HOSP_ADMSN_TIME
+        - HOSP_DISCH_TIME
+        
+    drop_cols:
+        - csn
+        - sepsis
+        - sepsis_lag_2
+        - sepsis_lag_4
+        - sepsis_lag_5
+        - sepsis_lag_6
+        
+    elixhauser:
+        - CHF
+        - Arrhythmia
+        - Valvular
+        - PHTN
+        - PVD
+        - HTN
+        - HTNcx
+        - Paralysis
+        - NeuroOther
+        - Pulmonary
+        - DM
+        - DMcx
+        - Hypothyroid
+        - Renal
+        - Liver
+        - PUD
+        - HIV
+        - Lymphoma
+        - Mets
+        - Tumor
+        - Rheumatic
+        - Coagulopathy
+        - Obesity
+        - WeightLoss
+        - FluidsLytes
+        - BloodLoss
+        - Anemia
+        - Alcohol
+        - Drugs
+        - Psychoses
+        - Depression
+        
+    zipcode_headers:
+        - country_code
+        - postal_code
+        - place_name
+        - name1
+        - code1
+        - name2
+        - code2
+        - name3
+        - code3
+        - latitude
+        - longitude
+        - accuracy
+
+
+tableone:
+    keep_hourly:
+        - albumin
+        - anion_gap
+        - best_map
+        - bicarb_(hco3)
+        - blood_urea_nitrogen_(bun)
+        - calcium
+        - chloride
+        - creatinine
+        - daily_weight_kg
+        - gcs_total_score
+        - glucose
+        - hematocrit
+        - hemoglobin
+        - platelets
+        - potassium
+        - procedure
+        - pulse
+        - sodium
+        - spo2
+        - unassisted_resp_rate
+        - white_blood_cell_count
+        - temperature
+        - csn
+    keep_reference:
+        - age
+        - gender
+        - race
+        - total_icu_days
+        - total_vent_days
+        - total_hosp_days
+        - sepsis
+        - csn
+    categorical:
+        - sepsis
+        - gender
+        - race
+    nonnormal:
+        - age
+    labels:
+        albumin: Albumin
+        anion_gap: Anion Gap
+        best_map: Mean Arterial Pressure (MAP)
+        bicarb_(hco3): Bicarbonate (HCO3)
+        blood_urea_nitrogen_(bun): Blood Urea Nitrogen
+        calcium: Calcium
+        chloride: Chloride
+        creatinine: Creatinine
+        daily_weight_kg: Weight (lbs)
+        gcs_total_score: Glasgow Comma Scale
+        glucose: Glucose
+        hematocrit: Hematocrit
+        hemoglobin: Hemoglobin
+        platelets: Platelets
+        potassium: Potassium
+        pulse: Heart Rate
+        sepsis: Sepsis
+        sodium: Sodium
+        spo2: SpO2
+        unassisted_resp_rate: Respiratory Rate
+        white_blood_cell_count: White Blood Cell Count
+        temperature: Temperature
+        age: Age
+        gender: Gender
+        race: Race
+        total_icu_days: ICU Length of stay (LOS)
+        total_vent_days: No. days on ventilator
+        total_hosp_days: LOS in hospital
+    columns:
+        - age
+        - gender
+        - race
+        - total_icu_days
+        - total_vent_days
+        - total_hosp_days
+        - albumin
+        - anion_gap
+        - best_map
+        - bicarb_(hco3)
+        - blood_urea_nitrogen_(bun)
+        - calcium
+        - chloride
+        - creatinine
+        - daily_weight_kg
+        - gcs_total_score
+        - glucose
+        - hematocrit
+        - hemoglobin
+        - platelets
+        - potassium
+        - procedure
+        - pulse
+        - sodium
+        - spo2
+        - unassisted_resp_rate
+        - white_blood_cell_count
+        - temperature
+        - sepsis
+
+
+
+
+
+biasdetection:
+    drop_cols:
+        - roc_auc
+        - tpr
+        - Type 3
+        - precision
+        - recall
+        - first_sep3_time
+        - first_sep3_susp
+        - first_sep3_SOFA
+        - start_index
+        - first_icu_start
+        - first_icu_end
+        - hospital_discharge_date_time
+        - discharge_status
+        - gender_code
+        - ethnicity_code
+        - year
+        - daysICU
+        - hoursICU
+        - minutesICU
+        - sepsis
+        - sofa_2
+        - sofa_2_time
+        - sofa_start_delta
+        - sofa_icu_delta
+        - pat_id
+        - har
+        - mrn
+        - study_id
+        - zip_code
+        - ed_arrival_source
+        - pre_admit_location
+        - ed_presentation_time
+        - hospital_admission_date_time
+        - admit_reason
+        - cpr_in_ed
+        - total_icu_days
+        - total_vent_days
+        - total_hosp_days
+        - discharge_to
+        - encounter_type
+        - postal_code
+        - place_name
+        - code1
+        - name2
+        - empi_nbr
+        - NAME
+        - ABBR
+        - PAT_MRN_ID
+        - LANGUAGE
+        - GUARANTOR_TYPE
+        - LANGUAGE_x
+        - IMMIGRATION_STATUS
+        - PATIENT_TYPE_1
+        - PATIENT_TYPE_2
+        - PAT_ENC_CSN_ID
+        - expired
+        - max_SOFA
+        
+    drop_static:
+        - alanine_aminotransferase_(alt)_min
+        - alanine_aminotransferase_(alt)_max
+        - alanine_aminotransferase_(alt)_mean
+        - albumin_min
+        - albumin_max
+        - albumin_mean
+        - alkaline_phosphatase_min
+        - alkaline_phosphatase_max
+        - alkaline_phosphatase_mean
+        - anion_gap_min
+        - anion_gap_max
+        - anion_gap_mean
+        - aspartate_aminotransferase_(ast)_min
+        - aspartate_aminotransferase_(ast)_max
+        - aspartate_aminotransferase_(ast)_mean
+        - base_excess_min
+        - base_excess_max
+        - base_excess_mean
+        - best_map_min
+        - best_map_max
+        - best_map_mean
+        - bicarb_(hco3)_min
+        - bicarb_(hco3)_max
+        - bicarb_(hco3)_mean
+        - bilirubin_total_min
+        - bilirubin_total_max
+        - bilirubin_total_mean
+        - blood_urea_nitrogen_(bun)_min
+        - blood_urea_nitrogen_(bun)_max
+        - blood_urea_nitrogen_(bun)_mean
+        - calcium_min
+        - calcium_max
+        - calcium_mean
+        - chloride_min
+        - chloride_max
+        - chloride_mean
+        - creatinine_min
+        - creatinine_max
+        - creatinine_mean
+        - daily_weight_kg_min
+        - daily_weight_kg_max
+        - daily_weight_kg_mean
+        - ed_min
+        - ed_max
+        - ed_mean
+        - fio2_min
+        - fio2_max
+        - fio2_mean
+        - gcs_total_score_min
+        - gcs_total_score_max
+        - gcs_total_score_mean
+        - glucose_min
+        - glucose_max
+        - glucose_mean
+        - hematocrit_min
+        - hematocrit_max
+        - hematocrit_mean
+        - hemoglobin_min
+        - hemoglobin_max
+        - hemoglobin_mean
+        - icu_min
+        - icu_max
+        - icu_mean
+        - imc_min
+        - imc_max
+        - imc_mean
+        - magnesium_min
+        - magnesium_max
+        - magnesium_mean
+        - partial_pressure_of_carbon_dioxide_(paco2)_min
+        - partial_pressure_of_carbon_dioxide_(paco2)_max
+        - partial_pressure_of_carbon_dioxide_(paco2)_mean
+        - partial_pressure_of_oxygen_(pao2)_min
+        - partial_pressure_of_oxygen_(pao2)_max
+        - partial_pressure_of_oxygen_(pao2)_mean
+        - pf_pa_min
+        - pf_pa_max
+        - pf_pa_mean
+        - pf_sp_min
+        - pf_sp_max
+        - pf_sp_mean
+        - ph_min
+        - ph_max
+        - ph_mean
+        - phosphorus_min
+        - phosphorus_max
+        - phosphorus_mean
+        - platelets_min
+        - platelets_max
+        - platelets_mean
+        - potassium_min
+        - potassium_max
+        - potassium_mean
+        - procedure_min
+        - procedure_max
+        - procedure_mean
+        - protein_min
+        - protein_max
+        - protein_mean
+        - pulse_min
+        - pulse_max
+        - pulse_mean
+        - sodium_min
+        - sodium_max
+        - sodium_mean
+        - spo2_min
+        - spo2_max
+        - spo2_mean
+        - unassisted_resp_rate_min
+        - unassisted_resp_rate_max
+        - unassisted_resp_rate_mean
+        - vent_status_min
+        - vent_status_max
+        - vent_status_mean
+        - white_blood_cell_count_min
+        - white_blood_cell_count_max
+        - white_blood_cell_count_mean
+        - temperature_min
+        - temperature_max
+        - temperature_mean
