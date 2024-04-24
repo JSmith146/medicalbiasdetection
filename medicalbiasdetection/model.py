@@ -321,16 +321,25 @@ def calculate_confusion_matrix(y_test, y_pred):
     """
     confusion_matrix = np.zeros((2, 2))
     for i in range(len(y_test)):
-        if y_test[i] == 0 and y_pred[i] == 0:
+        if y_test[i] == 0 and y_pred[i] == 0:   # true negative
             confusion_matrix[0, 0] += 1
-        elif y_test[i] == 0 and y_pred[i] == 1: #false positive
+        elif y_test[i] == 0 and y_pred[i] == 1: # false positive
             confusion_matrix[0, 1] += 1
-        elif y_test[i] == 1 and y_pred[i] == 0: #false negative
+        elif y_test[i] == 1 and y_pred[i] == 0: # false negative
             confusion_matrix[1, 0] += 1
-        elif y_test[i] == 1 and y_pred[i] == 1:
+        elif y_test[i] == 1 and y_pred[i] == 1: # true positive
             confusion_matrix[1, 1] += 1
     return confusion_matrix
 
+def calculate_rates(cm):
+    tp = cm[1][1]
+    tn = cm[0][0]
+    fp = cm[0][1]
+    fn = cm[1][0]
+    fpr = fp / (fp + tn)
+    tpr = tp / (tp + fn)
+    return tpr, fpr
+    
 def summarize_predictions(df,y_test_col,y_pred_col,risk_threshold):
 
     csns = df["csn"].unique().tolist()
@@ -342,21 +351,22 @@ def summarize_predictions(df,y_test_col,y_pred_col,risk_threshold):
         tmp = df.loc[df["csn"]==csn,[y_test_col,y_pred_col]].reset_index()
         tmp["y_test"] = tmp[y_test_col].astype('int')
         tmp["y_pred"] = [0 if i <= risk_threshold else 1 for i in tmp[y_pred_col]]
-        fpr, tpr, thresholds = roc_curve(tmp["y_test"], tmp["y_pred"])
+        # fpr, tpr, thresholds = roc_curve(tmp["y_test"], tmp["y_pred"])
         
         accuracy = accuracy_score(tmp["y_test"], tmp["y_pred"])
-        f2_score = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=2.0)
+        # f2_score = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=2.0)
         mcc = matthews_corrcoef(tmp['y_test'],tmp['y_pred'])
         cm = calculate_confusion_matrix(tmp["y_test"], tmp["y_pred"])
+        tpr, fpr = calculate_rates(cm)
         metrics["true_negative"] = cm[0][0] #true_negative
         metrics["false_positive"] = cm[0][1] #false_positive
         metrics["false_negative"] = cm[1][0] #false_negative
         metrics["true_positive"] = cm[1][1] #true_positive
-        metrics["tpr"] = tpr[1]
-        metrics["fpr"] = fpr[1]
+        metrics["tpr"] = tpr
+        metrics["fpr"] = fpr
         metrics["mcc"] = mcc
-        metrics["f1_score"] = f1_score(tmp["y_test"], tmp["y_pred"])
-        metrics["f2_score"] = f2_score
+        metrics["f1_score"] = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=1.0)
+        metrics["f2_score"] = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=2.0)
         metrics["precision"] = precision_score(tmp["y_test"], tmp["y_pred"])
         metrics["recall"] = recall_score(tmp["y_test"], tmp["y_pred"])
         metrics["accuracy"] = accuracy
@@ -476,17 +486,17 @@ def summarize_predictions_i(df,y_test_col,y_pred_col,risk_threshold):
     accuracy = accuracy_score(tmp["y_test"], tmp["y_pred"])
     f2_score = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=2.0)
     cm = calculate_confusion_matrix(tmp["y_test"].values, tmp["y_pred"].values)
-    
+    tpr, fpr = calculate_rates(cm)
     # store performance metrics
     metrics["true_negative"] = cm[0][0] #true_negative
     metrics["false_positive"] = cm[0][1] #false_positive
     metrics["false_negative"] = cm[1][0] #false_negative
     metrics["true_positive"] = cm[1][1] #true_positive
     metrics["mcc"] = mcc
-    metrics["tpr"] = tpr[1]
-    metrics["fpr"] = fpr[1]
-    metrics["f1_score"] = f1_score(tmp["y_test"], tmp["y_pred"])
-    metrics["f2_score"] = f2_score
+    metrics["tpr"] = tpr
+    metrics["fpr"] = fpr
+    metrics["f1_score"] = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=1.0)
+    metrics["f2_score"] = fbeta_score(tmp['y_test'],tmp['y_pred'],beta=2.0)
     metrics["precision"] = precision_score(tmp["y_test"], tmp["y_pred"])
     metrics["recall"] = recall_score(tmp["y_test"], tmp["y_pred"])
     metrics["accuracy"] = accuracy

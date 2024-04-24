@@ -10,7 +10,7 @@ DIR:
     predictions: MBD_Runs/{RUN}/predictions/{OBJECTIVE}/{TYPE}
     images: MBD_Runs/{RUN}/images/{OBJECTIVE}
     variations: MBD_Runs/{RUN}/variations/{VAR_NAME}/{OBJECTIVE}
-    thresholds: MBD_Runs/{RUN}/thresholds/{OBJECTIVE}
+    thresholds: MBD_Runs/{RUN}/thresholds/{VALUE}/{OBJECTIVE}
     cases: MBD_Runs/{RUN}/data/cases/positive_cases.csv
 
 # data files
@@ -20,12 +20,12 @@ data:
     lab_treatment_dict: /labs/kamaleswaranlab/MODS/Smith/my_scripts/public/data/lab_trt_dict.json
     zipcode: /labs/kamaleswaranlab/MODS/Smith/my_scripts/Thesis/Chapter_2-ImplicitBiasDetection/data/US.txt
     supertable: /labs/kamaleswaranlab/MODS/Smith/Data/super_table_data_dictionary.csv
-    pat_pkl: /labs/kamaleswaranlab/MODS/Encounter_Pickles/gr/{year}/{csn}.pickle
+    pat_pkl: /labs/collab/K-lab-MODS/MODS-PHI/Encounter_Pickles/gr/{year}/{csn}.pickle
     pkl_dtypes: /labs/kamaleswaranlab/MODS/Smith/Data/pkl_map.json
 
     grady: 
-        enc_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/gr/gr_sepsis_summary/07_02_21/encounter_summary_all_07_02_2021.csv
-        elix_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/gr/gr_sepsis_summary/07_02_21/quan_elix_icd10_all07_02_2021.csv
+        enc_summary: /labs/collab/K-lab-MODS/MODS-PHI/Encounter_Pickles/gr/gr_sepsis_summary/07_02_21/encounter_summary_all_07_02_2021.csv
+        elix_summary: /labs/collab/K-lab-MODS/MODS-PHI/Encounter_Pickles/gr/gr_sepsis_summary/07_02_21/quan_elix_icd10_all07_02_2021.csv
         extra_summary: /labs/kamaleswaranlab/MODS/Smith/Data/language/grady/grady_extra_vars.csv
         demographic: /labs/kamaleswaranlab/MODS/Data/Grady_Data/1. Administrative Attributes/Encounters/
         incarceration: /labs/kamaleswaranlab/MODS/Smith/Data/Grady extra vars - Language, Legal Citizenship, Zip, Incarceration.xlsx
@@ -54,8 +54,8 @@ data:
         long: -84.3824
         
     emory:
-        enc_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/em2/em_sepsis_summary/encounter_summary
-        elix_summary: /labs/kamaleswaranlab/MODS/Encounter_Pickles/em/em_sepsis_summary/7_2_21/quan_elix_icd10_all07_02_2021.csv
+        enc_summary: /labs/collab/K-lab-MODS/MODS-PHI/Encounter_Pickles/em2/em_sepsis_summary/encounter_summary
+        elix_summary: /labs/collab/K-lab-MODS/MODS-PHI/Encounter_Pickles/em/em_sepsis_summary/7_2_21/quan_elix_icd10_all07_02_2021.csv
         extra_summary: /labs/kamaleswaranlab/MODS/Smith/Data/language/emory/emory_extra_vars.csv
         language: /labs/kamaleswaranlab/MODS/Smith/Data/Emory extra var - Language.csv
         demographic: 
@@ -77,7 +77,52 @@ data:
         lat: 33.7914
         long: -84.3195
     
- 
+pkl_dtypes:
+    alanine_aminotransferase_(alt): float64
+    albumin: float64
+    alkaline_phosphatase: float64
+    anion_gap: float64
+    aspartate_aminotransferase_(ast): float64 
+    base_excess: float64 
+    best_map: float64 
+    bicarb_(hco3): float64 
+    bilirubin_total: float64 
+    blood_urea_nitrogen_(bun): float64 
+    calcium: float64 
+    chloride: float64 
+    creatinine: float64 
+    daily_weight_kg:  float64 
+    fio2: float64 
+    gcs_total_score: int64 
+    glucose: float64 
+    hematocrit: float64 
+    hemoglobin: float64 
+    magnesium: float64
+    partial_pressure_of_carbon_dioxide_(paco2): float64
+    partial_pressure_of_oxygen_(pao2): float64
+    pf_sp: float64
+    ph: float64
+    phosphorus: float64
+    platelets: float64
+    potassium: float64
+    procedure: int64
+    protein: float64
+    pulse: float64
+    sodium: float64
+    spo2: float64
+    unassisted_resp_rate: float64
+    vent_status: int64 
+    white_blood_cell_count: float64 
+    temperature: float64 
+    sbp_cuff: float64 
+    dbp_cuff: float64 
+    map_cuff: float64
+
+fill_na:
+    gcs_total_score: 0
+    procedure: 0
+    vent_status: 0
+    
 preprocess:
     fim_cols:
         - alanine_aminotransferase_(alt)
@@ -101,7 +146,6 @@ preprocess:
         - magnesium
         - partial_pressure_of_carbon_dioxide_(paco2)
         - partial_pressure_of_oxygen_(pao2)
-        - pf_pa
         - pf_sp
         - ph
         - phosphorus
@@ -113,9 +157,9 @@ preprocess:
         - white_blood_cell_count
         - sofa_score_total
         - sirs_score_total
-        - sbp_line
-        - dbp_line
-        - map_line
+        - sbp_cuff
+        - dbp_cuff
+        - map_cuff
         - best_map
         
     vital_cols:
@@ -123,11 +167,54 @@ preprocess:
         - spo2
         - unassisted_resp_rate
         - temperature
-        - sbp_line
-        - dbp_line
-        - map_line
+        - sbp_cuff
+        - dbp_cuff
+        - map_cuff
         - best_map
         
+    time_series_cols:
+        - alanine_aminotransferase_(alt)
+        - albumin
+        - alkaline_phosphatase
+        - anion_gap
+        - aspartate_aminotransferase_(ast)
+        - base_excess
+        - best_map
+        - bicarb_(hco3)
+        - bilirubin_total
+        - blood_urea_nitrogen_(bun)
+        - calcium
+        - chloride
+        - creatinine
+        - daily_weight_kg
+        - fio2
+        - gcs_total_score
+        - glucose
+        - hematocrit
+        - hemoglobin
+        - magnesium
+        - partial_pressure_of_carbon_dioxide_(paco2)
+        - partial_pressure_of_oxygen_(pao2)
+        - pf_sp
+        - ph
+        - phosphorus
+        - platelets
+        - potassium
+        - procedure
+        - protein
+        - pulse
+        - sodium
+        - spo2
+        - unassisted_resp_rate
+        - vent_status
+        - white_blood_cell_count
+        - temperature
+        - sbp_cuff
+        - dbp_cuff
+        - map_cuff
+        - sofa_score_total
+        - sirs_score_total
+    
     drop_missing:
         - ammonia
         - amylase
@@ -137,25 +224,32 @@ preprocess:
         - dobutamine_dose_weight
         - dopamine_dose_weight
         - epinephrine_dose_weight
-        - erythrocyte_sedimentation_rate_(esr) 
+        - erythrocyte_sedimentation_rate_(esr)
         - fibrinogen
         - hemoglobin_a1c
         - inr
         - lactic_acid
         - lipase
-        - norepinephrine_dose_weight 
+        - norepinephrine_dose_weight
         - parathyroid_level
         - partial_prothrombin_time_(ptt)
+        - pf_pa
         - phenylephrine_dose_weight
         - prealbumin
         - procalcitonin
         - prothrombin_time_(pt)
         - saturation_of_oxygen_(sao2)
         - thrombin_time
-        - thyroid_stimulating_hormone_(tsh) 
+        - thyroid_stimulating_hormone_(tsh)
         - transferrin
         - troponin
         - vasopressin_dose_weight
+        - sbp_line
+        - dbp_line
+        - map_line
+        - ed
+        - icu
+        - imc
         
     drop_cols:
         - index
@@ -544,3 +638,13 @@ biasdetection:
         - temperature_min
         - temperature_max
         - temperature_mean
+        - sbp_cuff_min
+        - sbp_cuff_max
+        - sbp_cuff_mean
+        - dbp_cuff_min
+        - dbp_cuff_max
+        - dbp_cuff_mean
+        - map_cuff_min
+        - map_cuff_max
+        - map_cuff_mean
+        

@@ -1,15 +1,9 @@
 #required libraries
 import os
-# import yaml
-
 import pandas as pd
-# import datatable as dt
 import numpy as np
-
 import json
 from tqdm import tqdm
-# import pprint as pp
-# import datetime
 
 # Set envrionmental variables
 LOG_PATH = os.getenv('LOG_PATH')

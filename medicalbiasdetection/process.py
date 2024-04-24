@@ -134,6 +134,8 @@ def nextClosestTime(time_series, t):
     Returns:
     datetime or similar: The closest time to t found in time_series.
     """
+    time_series = pd.Series(time_series)
+    
     if not (isinstance(time_series, list) or isinstance(time_series, pd.Series)):
         raise TypeError("Input 'time_series' must be a list or pandas Series.")
 
@@ -164,7 +166,6 @@ def feature_informative_missingness(patient_vitals_df):
         # generate column names for new information missingness features
         f1_name = f"{col}_interval_f1"
         f2_name = f"{col}_interval_f2"
-        diff_name = f"{col}_diff"
         
         # create a sequential count of non-missing data points
         patient.loc[nonmissing_idx,f1_name] = np.arange(1,len(nonmissing_idx)+1)
@@ -179,10 +180,38 @@ def feature_informative_missingness(patient_vitals_df):
             patient.loc[:, f2_name] = -1
         else:
             patient.loc[:nonmissing_idx[0]-1, f2_name] = -1
+
+    return patient
+
+
+def time_diff(patient_vitals_df):
+    """
+    Find hourly difference in column values   
+    Parameters:
+    patient_vitals_df (DataFrame): patient vital sign information
+    """
+    # copy patient vital df
+    patient = patient_vitals_df.copy()
+    
+    # collect original index of data
+    idx_temp = patient.index
+    
+    # reset index to ensure sequential order
+    patient = patient.reset_index(drop=True)
+    
+    # loop through each vital sign
+    for col in patient.columns:
+        # get index of nonmissing data points
+        nonmissing_idx = patient.index[~patient[col].isna()].tolist()
         
+        # generate column names for new time series features
+        diff_name = f"{col}_diff"
+        
+        # create time series features and forward fill
         patient[diff_name] = patient.loc[nonmissing_idx, col].diff()
         patient[diff_name] = patient[diff_name].fillna(method = "ffill")
     return patient
+
 
 def feature_slide_window(vital_df,window):
     """
@@ -259,12 +288,12 @@ def feature_empiric_score(temp):
         temp.loc[temp["unassisted_resp_rate"].isna(),"unassisted_resp_rate_score"] = np.nan
 
     #MAP Score: (SOFA metric)
-    col = "map_line"
+    col = "map_cuff"
     if col in cols:
-        temp["map_line_score"] = 1
-        mask = (temp["map_line"] >= 70)
-        temp.loc[mask, "map_line_score"] = 0
-        temp.loc[temp["map_line"].isna(),"map_line_score"] = np.nan
+        temp["map_cuff_score"] = 1
+        mask = (temp["map_cuff"] >= 70)
+        temp.loc[mask, "map_cuff_score"] = 0
+        temp.loc[temp["map_cuff"].isna(),"map_cuff_score"] = np.nan
     
     # Creatinine score: (SOFA metric)
     col = "creatinine"
@@ -285,9 +314,9 @@ def feature_empiric_score(temp):
     # col = "qsofa"
     # if col in cols:
     temp["qsofa"] = 0
-    mask = (temp["sbp_line"] <= 100) & (temp["unassisted_resp_rate"] >= 22)
+    mask = (temp["sbp_cuff"] <= 100) & (temp["unassisted_resp_rate"] >= 22)
     temp.loc[mask, "qsofa"] = 1
-    mask = (temp["sbp_line"].isna()) | (temp["unassisted_resp_rate"].isna())
+    mask = (temp["sbp_cuff"].isna()) | (temp["unassisted_resp_rate"].isna())
     temp.loc[mask, "qsofa"] = np.nan
 
     # # sirs

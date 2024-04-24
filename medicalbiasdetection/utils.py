@@ -260,14 +260,22 @@ def create_run_dir(run , root=None, verbose=False):
         'images/Accuracy':'image_types',
         'images/F1_Score':'image_types',
         'images/F2_Score':'image_types',
-        'thresholds':['Accuracy','F1_Score','F2_Score']
+        'thresholds':['0.0', '0.25', '0.50', '0.75', '1.0'],
+        'thresholds/0.0':'model_types',
+        'thresholds/0.25': 'model_types',
+        'thresholds/0.50': 'model_types',
+        'thresholds/0.75': 'model_types',
+        'thresholds/1.0': 'model_types'
+        # 'thresholds':['Accuracy','F1_Score','F2_Score']
+        
         }
     
     
     if not os.path.exists(folder):
         os.makedirs(folder)
         for path in ['data','models/XGB','predictions','train_test_split','images','thresholds',
-                     'images/Accuracy','images/F1_Score','images/F2_Score']:
+                     'images/Accuracy','images/F1_Score','images/F2_Score','thresholds/0.0',
+                     'thresholds/0.25','thresholds/0.50','thresholds/0.75','thresholds/1.0']:
             subfolder_path = os.path.join(folder, path)
             if verbose:
                 print(subfolder_path)
